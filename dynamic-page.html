@@ -20,6 +20,10 @@
             padding: 5px;
             width: 200px;
         }
+        .net-price {
+            margin-top: 20px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -68,6 +72,10 @@
         <label for="distributorDiscount">11. Distributor Discount (%):</label>
         <input type="number" id="distributorDiscount" value="0">
     </div>
+    <div class="field net-price">
+        <label for="netPrice">Net Price:</label>
+        <input type="number" id="netPrice" value="0" disabled>
+    </div>
 
     <script>
         const inputs = document.querySelectorAll('input');
@@ -98,7 +106,9 @@
             const partnerPrice = customerPrice * (1 - partnerDiscount / 100);
             document.getElementById('partnerPrice').value = partnerPrice.toFixed(2);
 
-            // Distributor Price is not shown as an output field, but the discount is applied to Partner Price
+            // Calculate Net Price (applying Distributor Discount to Partner Price)
+            const netPrice = partnerPrice * (1 - distributorDiscount / 100);
+            document.getElementById('netPrice').value = netPrice.toFixed(2);
         }
 
         calculatePrices(); // Initial calculation
