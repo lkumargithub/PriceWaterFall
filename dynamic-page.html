@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .field {
+            margin-bottom: 10px;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+        }
+        input {
+            padding: 5px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dynamic Calculation Page</h1>
+    <div class="field">
+        <label for="listPrice">List Price:</label>
+        <input type="number" id="listPrice" value="0">
+    </div>
+    <div class="field">
+        <label for="regularPrice">Regular Price:</label>
+        <input type="number" id="regularPrice" value="0" disabled>
+    </div>
+    <div class="field">
+        <label for="discount">Discount (%):</label>
+        <input type="number" id="discount" value="0">
+    </div>
+    <div class="field">
+        <label for="prorateMultiplier">Prorate Multiplier:</label>
+        <input type="number" id="prorateMultiplier" value="1">
+    </div>
+    <div class="field">
+        <label for="netPrice">Net Price:</label>
+        <input type="number" id="netPrice" value="0" disabled>
+    </div>
+
+    <script>
+        const listPriceInput = document.getElementById('listPrice');
+        const regularPriceInput = document.getElementById('regularPrice');
+        const discountInput = document.getElementById('discount');
+        const prorateMultiplierInput = document.getElementById('prorateMultiplier');
+        const netPriceInput = document.getElementById('netPrice');
+
+        // Function to calculate Regular Price and Net Price
+        function calculatePrices() {
+            const listPrice = parseFloat(listPriceInput.value) || 0;
+            const discount = parseFloat(discountInput.value) || 0;
+            const prorateMultiplier = parseFloat(prorateMultiplierInput.value) || 1;
+
+            // Regular Price equals List Price
+            regularPriceInput.value = listPrice;
+
+            // Net Price = Regular Price - Discount
+            const discountAmount = (listPrice * discount) / 100;
+            const netPrice = (listPrice - discountAmount) * prorateMultiplier;
+
+            netPriceInput.value = netPrice.toFixed(2);
+        }
+
+        // Attach event listeners to editable inputs
+        listPriceInput.addEventListener('input', calculatePrices);
+        discountInput.addEventListener('input', calculatePrices);
+        prorateMultiplierInput.addEventListener('input', calculatePrices);
+    </script>
+</body>
+</html>
