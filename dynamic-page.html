@@ -26,27 +26,14 @@
         label {
             margin-bottom: 5px;
             font-weight: bold;
-        }
-        input {
-            padding: 10px;
-            width: 100%;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        input:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 5px rgba(0,123,255,0.5);
-        }
-        .net-price {
-            margin-top: 20px;
-            font-weight: bold;
+            display: flex;
+            align-items: center;
         }
         .tooltip {
             cursor: help;
             color: #007bff;
             margin-left: 5px;
+            position: relative;
         }
         .tooltip .tooltiptext {
             visibility: hidden;
@@ -67,6 +54,183 @@
         .tooltip:hover .tooltiptext {
             visibility: visible;
             opacity: 1;
+        }
+        input {
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0,123,255,0.5);
+        }
+        .net-price {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dynamic Price Calculation</h1>
+        <div class="field">
+            <label for="listPrice">1. List Price: <span class="tooltip">?<span class="tooltiptext">The original price of the product before any discounts</span></span></label>
+            <input type="number" id="listPrice" value="0">
+        </div>
+        <div class="field">
+            <label for="contractedPrice">2. Contracted Price: <span class="tooltip">?<span class="tooltiptext">The price agreed upon in a contract</span></span></label>
+            <input type="number" id="contractedPrice" value="0">
+        </div>
+        <div class="field">
+            <label for="specialPrice">3. Special Price: <span class="tooltip">?<span class="tooltiptext">A promotional or discounted price</span></span></label>
+            <input type="number" id="specialPrice" value="0">
+        </div>
+        <div class="field">
+            <label for="prorateMultiplier">4. Prorate Multiplier: <span class="tooltip">?<span class="tooltiptext">Factor used to adjust the price based on usage or time</span></span></label>
+            <input type="number" id="prorateMultiplier" value="1">
+        </div>
+        <div class="field">
+            <label for="proratedPrice">5. Prorated Price: <span class="tooltip">?<span class="tooltiptext">Price after applying the prorate multiplier</span></span></label>
+            <input type="number" id="proratedPrice" value="0" disabled>
+        </div>
+        <div class="field">
+            <label for="regularPrice">6. Regular Price: <span class="tooltip">?<span class="tooltiptext">The lowest of List, Contracted, or Special Price</span></span></label>
+            <input type="number" id="regularPrice" value="0" disabled>
+        </div>
+        <div class="field">
+            <label for="additionalDiscount">7. Additional Discount (%): <span class="tooltip">?<span class="tooltiptext">Extra discount applied to the regular price</ <span class="tooltip">?<span class="tooltiptext">Extra discount applied to the regular price</span></span></label>
+            <input type="number" id="additionalDiscount" value="0">
+        </div>
+        <div class="field">
+            <label for="customerPrice">8. Customer Price: <span class="tooltip">?<span class="tooltiptext">Price after applying the additional discount</span></span></label>
+            <input type="number" id="customerPrice" value="0" disabled>
+        </div>
+        <div class="field">
+            <label for="partnerDiscount">9. Partner Discount (%): <span class="tooltip">?<span class="tooltiptext">Discount given to partners</span></span></label>
+            <input type="number" id="partnerDiscount" value="0">
+        </div>
+        <div class="field">
+            <label for="partnerPrice">10. Partner Price: <span class="tooltip">?<span class="tooltiptext">Price after applying the partner discount</span></span></label>
+            <input type="number" id="partnerPrice" value="0" disabled>
+        </div>
+        <div class="field">
+            <label for="distributorDiscount">11. Distributor Discount (%): <span class="tooltip">?<span class="tooltiptext">Discount given to distributors</span></span></label>
+            <input type="number" id="distributorDiscount" value="0">
+        </div>
+        <div class="field net-price">
+            <label for="netPrice">Net Price: <span class="tooltip">?<span class="tooltiptext">Final price after all discounts</span></span></label>
+            <input type="number" id="netPrice" value="0" disabled>
+        </div>
+    </div>
+
+    <script>
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => input.addEventListener('input', calculatePrices));
+
+        function calculatePrices() {
+            const listPrice = parseFloat(document.getElementById('listPrice').value) || 0;
+            const contractedPrice = parseFloat(document.getElementById('contractedPrice').value) || 0;
+            const specialPrice = parseFloat(document.getElementById('specialPrice').value) || 0;
+            const prorateMultiplier = parseFloat(document.getElementById('prorateMultiplier').value) || 1;
+            const additionalDiscount = parseFloat(document.getElementById('additionalDiscount').value) || 0;
+            const partnerDiscount = parseFloat(document.getElementById('partnerDiscount').value) || 0;
+            const distributorDiscount = parseFloat(document.getElementById('distributorDiscount').value) || 0;
+
+            const regularPrice = Math.min(listPrice, contractedPrice || Infinity, specialPrice || Infinity);
+            document.getElementById('regularPrice').value = regularPrice.toFixed(2);
+
+            const proratedPrice = regularPrice * prorateMultiplier;
+            document.getElementById('proratedPrice').value = proratedPrice.toFixed(2);
+
+            const customerPrice = proratedPrice * (1 - additionalDiscount / 100);
+            document.getElementById('customerPrice').value = customerPrice.toFixed(2);
+
+            const partnerPrice = customerPrice * (1 - partnerDiscount / 100);
+            document.getElementById('partnerPrice').value = partnerPrice.toFixed(2);
+
+            const netPrice = partnerPrice * (1 - distributorDiscount / 100);
+            document.getElementById('netPrice').value = netPrice.toFixed(2);
+        }
+
+        calculatePrices(); // Initial calculation
+    </script>
+</body>
+</html> ```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Price Calculation</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+        .field {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        .tooltip {
+            cursor: help;
+            color: #007bff;
+            margin-left: 5px;
+            position: relative;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        input {
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0,123,255,0.5);
+        }
+        .net-price {
+            margin-top: 20px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -99,7 +263,8 @@
         </div>
         <div class="field">
             <label for="additionalDiscount">7. Additional Discount (%): <span class="tooltip">?<span class="tooltiptext">Extra discount applied to the regular price</span></span></label>
-            <input type="number" id="additionalDiscount" value="0">
+            <input type="number" id=" ```html
+additionalDiscount" value="0">
         </div>
         <div class="field">
             <label for="customerPrice">8. Customer Price: <span class="tooltip">?<span class="tooltiptext">Price after applying the additional discount</span></span></label>
